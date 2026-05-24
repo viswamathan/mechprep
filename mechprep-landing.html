@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MechPrep AI — Mechanical Engineering Interview Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0d0f;
+    --bg2: #0f1417;
+    --bg3: #141a1e;
+    --teal: #1ad99a;
+    --teal2: #0fb87f;
+    --amber: #f5a623;
+    --text: #e8ede8;
+    --muted: #6b7a72;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(26,217,154,0.25);
+    --bebas: 'Bebas Neue', sans-serif;
+    --dm: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--dm);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Blueprint grid overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,217,154,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,217,154,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+    height: 64px;
+    background: rgba(10,13,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--bebas);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+    background: var(--teal);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--teal);
+    color: #021a0e;
+    padding: 9px 22px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: background 0.2s, transform 0.15s;
+  }
+
+  .nav-cta:hover { background: #2effa8; transform: translateY(-1px); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 5vw 80px;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(26,217,154,0.1);
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 0.5px;
+    margin-bottom: 28px;
+    width: fit-content;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero-headline {
+    font-family: var(--bebas);
+    font-size: clamp(72px, 10vw, 136px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 8px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-headline .accent { color: var(--teal); }
+
+  .hero-sub-headline {
+    font-family: var(--bebas);
+    font-size: clamp(36px, 5vw, 68px);
+    line-height: 1;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-desc {
+    max-width: 560px;
+    font-size: 18px;
+    color: #9aab9f;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    font-weight: 300;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-desc strong { color: var(--text); font-weight: 500; }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: #021a0e;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover { background: #2effa8; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(26,217,154,0.25); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  .stat-item {}
+  .stat-num {
+    font-family: var(--bebas);
+    font-size: 42px;
+    color: var(--teal);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* Hero decorative corner element */
+  .hero-corner {
+    position: absolute;
+    right: 5vw;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 420px;
+    height: 420px;
+    opacity: 0.12;
+    animation: spin 40s linear infinite;
+  }
+
+  @keyframes spin { from{transform:translateY(-50%) rotate(0)} to{transform:translateY(-50%) rotate(360deg)} }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── FEATURES STRIP ─── */
+  .features-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .strip-inner {
+    display: flex;
+    width: max-content;
+    animation: marquee 28s linear infinite;
+  }
+
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  .strip-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border-right: 1px solid var(--border);
+  }
+
+  .strip-item span { color: var(--teal); font-size: 16px; }
+
+  /* ─── MODULES ─── */
+  .section {
+    padding: 100px 5vw;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--bebas);
+    font-size: clamp(42px, 6vw, 72px);
+    letter-spacing: 2px;
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    max-width: 520px;
+    color: #9aab9f;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 56px;
+  }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .module-card {
+    background: var(--bg2);
+    padding: 32px 28px;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .module-card:hover { background: var(--bg3); }
+
+  .module-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .module-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .module-title {
+    font-family: var(--bebas);
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+
+  .module-desc {
+    font-size: 14px;
+    color: #7a8a80;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .module-tag {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    background: rgba(26,217,154,0.1);
+    color: var(--teal);
+    border: 1px solid rgba(26,217,154,0.2);
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  .how-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    margin-top: 48px;
+    position: relative;
+  }
+
+  .steps-row::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-item {
+    padding: 0 20px 0 0;
+    text-align: left;
+  }
+
+  .step-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--border2);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--bebas);
+    font-size: 22px;
+    color: var(--teal);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ─── TOPICS ─── */
+  .topics-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 40px;
+  }
+
+  .topic-pill {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    background: var(--bg2);
+    transition: all 0.2s;
+    cursor: default;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .topic-pill:hover {
+    border-color: var(--border2);
+    color: var(--teal);
+    background: rgba(26,217,154,0.05);
+  }
+
+  .topic-pill.featured {
+    border-color: var(--border2);
+    color: var(--teal);
+    background: rgba(26,217,154,0.08);
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .testi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 24px;
+    transition: border-color 0.2s;
+  }
+
+  .testi-card:hover { border-color: rgba(26,217,154,0.2); }
+
+  .testi-stars {
+    color: var(--amber);
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  .testi-text {
+    font-size: 15px;
+    color: #b0c0b5;
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .testi-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(26,217,154,0.12);
+    color: var(--teal);
+    flex-shrink: 0;
+  }
+
+  .testi-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .testi-role { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+
+  /* ─── CTA SECTION ─── */
+  .cta-section {
+    text-align: center;
+    padding: 120px 5vw;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(26,217,154,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section .section-title { margin-bottom: 20px; }
+
+  .cta-section .section-desc {
+    max-width: 480px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+
+  .cta-section .hero-ctas { justify-content: center; }
+
+  .cta-note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.3px;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 5vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    position: relative;
+    z-index: 1;
+    gap: 16px;
+  }
+
+  .footer-logo {
+    font-family: var(--bebas);
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .footer-logo span { color: var(--teal); }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.3px;
+  }
+
+  .footer-links {
+    display: flex; gap: 24px;
+  }
+
+  .footer-links a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    font-family: var(--mono);
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--teal); }
+
+  @media (max-width: 768px) {
+    .hero-corner { display: none; }
+    .nav-links { display: none; }
+    .steps-row::before { display: none; }
+    .step-item { padding: 0; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">⚙</div>
+    MECHPREP<span style="color:var(--teal)"> AI</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#modules">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#topics">Topics</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+  </ul>
+  <a href="#try" class="nav-cta">Try Free →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    AI-POWERED · FREE TO USE · BUILT FOR ENGINEERS
+  </div>
+
+  <h1 class="hero-headline">
+    CRACK YOUR<br>
+    <span class="accent">MECH</span> INTERVIEW
+  </h1>
+  <p class="hero-sub-headline">WITH AI THAT THINKS LIKE AN INTERVIEWER</p>
+
+  <p class="hero-desc">
+    MechPrep is the only AI agent built exclusively for <strong>Mechanical Engineering</strong> students and freshers. Mock interviews, MCQ quizzes, CAD/FEA tests, HR coaching — all in one place.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="#try" class="btn-primary">Start Practicing Free →</a>
+    <a href="#modules" class="btn-secondary">See all features</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">AI-POWERED MODULES</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">500+</div>
+      <div class="stat-label">ENGINEERING QUESTIONS</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">7</div>
+      <div class="stat-label">CORE ME SUBJECTS</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">FREE TO START</div>
+    </div>
+  </div>
+
+  <!-- Decorative SVG gear -->
+  <svg class="hero-corner" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="80" stroke="#1ad99a" stroke-width="1"/>
+    <circle cx="100" cy="100" r="50" stroke="#1ad99a" stroke-width="1"/>
+    <circle cx="100" cy="100" r="20" stroke="#1ad99a" stroke-width="1"/>
+    <line x1="100" y1="10" x2="100" y2="190" stroke="#1ad99a" stroke-width="0.5"/>
+    <line x1="10" y1="100" x2="190" y2="100" stroke="#1ad99a" stroke-width="0.5"/>
+    <line x1="30" y1="30" x2="170" y2="170" stroke="#1ad99a" stroke-width="0.5"/>
+    <line x1="170" y1="30" x2="30" y2="170" stroke="#1ad99a" stroke-width="0.5"/>
+    <rect x="85" y="4" width="30" height="16" rx="2" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="85" y="180" width="30" height="16" rx="2" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="4" y="85" width="16" height="30" rx="2" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="180" y="85" width="16" height="30" rx="2" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="26" y="26" width="16" height="16" rx="2" transform="rotate(45 34 34)" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="158" y="26" width="16" height="16" rx="2" transform="rotate(45 166 34)" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="26" y="158" width="16" height="16" rx="2" transform="rotate(45 34 166)" stroke="#1ad99a" stroke-width="1"/>
+    <rect x="158" y="158" width="16" height="16" rx="2" transform="rotate(45 166 166)" stroke="#1ad99a" stroke-width="1"/>
+  </svg>
+</section>
+
+<!-- FEATURES STRIP -->
+<div class="features-strip">
+  <div class="strip-inner">
+    <div class="strip-item"><span>⚙</span> THERMODYNAMICS MCQ</div>
+    <div class="strip-item"><span>💧</span> FLUID MECHANICS QUIZ</div>
+    <div class="strip-item"><span>🔧</span> MACHINE DESIGN PREP</div>
+    <div class="strip-item"><span>📐</span> CAD / FEA QUESTIONS</div>
+    <div class="strip-item"><span>🏭</span> MANUFACTURING PROCESS</div>
+    <div class="strip-item"><span>🤝</span> HR ROUND COACHING</div>
+    <div class="strip-item"><span>📄</span> ATS RESUME CHECKER</div>
+    <div class="strip-item"><span>📊</span> PROGRESS TRACKING</div>
+    <div class="strip-item"><span>⚙</span> THERMODYNAMICS MCQ</div>
+    <div class="strip-item"><span>💧</span> FLUID MECHANICS QUIZ</div>
+    <div class="strip-item"><span>🔧</span> MACHINE DESIGN PREP</div>
+    <div class="strip-item"><span>📐</span> CAD / FEA QUESTIONS</div>
+    <div class="strip-item"><span>🏭</span> MANUFACTURING PROCESS</div>
+    <div class="strip-item"><span>🤝</span> HR ROUND COACHING</div>
+    <div class="strip-item"><span>📄</span> ATS RESUME CHECKER</div>
+    <div class="strip-item"><span>📊</span> PROGRESS TRACKING</div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="section" id="modules">
+  <div class="section-tag">// FEATURES</div>
+  <h2 class="section-title">EVERYTHING YOU<br>NEED TO GET PLACED</h2>
+  <p class="section-desc">Five AI-powered modules that cover every round of a mechanical engineering interview — from technical MCQs to HR behavioral questions.</p>
+
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="module-icon" style="background:rgba(26,217,154,0.1);border-color:rgba(26,217,154,0.2);">🎙</div>
+      <div class="module-num">MODULE 01</div>
+      <div class="module-title">MOCK INTERVIEW</div>
+      <p class="module-desc">Chat with an AI interviewer that asks adaptive technical questions, scores your answers out of 10, and gives instant expert feedback with follow-up questions.</p>
+      <span class="module-tag">ADAPTIVE AI · REAL-TIME FEEDBACK</span>
+    </div>
+    <div class="module-card">
+      <div class="module-icon" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.2);">📋</div>
+      <div class="module-num">MODULE 02</div>
+      <div class="module-title">TECHNICAL MCQ</div>
+      <p class="module-desc">Freshly generated MCQs across 7 core ME subjects — easy, medium, and hard difficulty. Streak system and live score to keep you motivated.</p>
+      <span class="module-tag">500+ QUESTIONS · 7 SUBJECTS</span>
+    </div>
+    <div class="module-card">
+      <div class="module-icon" style="background:rgba(26,217,154,0.1);border-color:rgba(26,217,154,0.2);">🤝</div>
+      <div class="module-num">MODULE 03</div>
+      <div class="module-title">HR ROUND COACH</div>
+      <p class="module-desc">Practice behavioral questions with STAR method coaching. AI evaluates your answer, scores it, highlights gaps, and suggests a stronger version.</p>
+      <span class="module-tag">STAR METHOD · BEHAVIORAL COACHING</span>
+    </div>
+    <div class="module-card">
+      <div class="module-icon" style="background:rgba(90,130,255,0.1);border-color:rgba(90,130,255,0.2);">📄</div>
+      <div class="module-num">MODULE 04</div>
+      <div class="module-title">ATS RESUME CHECK</div>
+      <p class="module-desc">Paste your resume and get an ATS score out of 100. AI flags missing keywords, format issues, weak sections, and gives role-specific suggestions.</p>
+      <span class="module-tag">ATS SCORE · KEYWORD ANALYSIS</span>
+    </div>
+    <div class="module-card">
+      <div class="module-icon" style="background:rgba(26,217,154,0.1);border-color:rgba(26,217,154,0.2);">📊</div>
+      <div class="module-num">MODULE 05</div>
+      <div class="module-title">PROGRESS TRACKER</div>
+      <p class="module-desc">Topic-wise readiness scores, overall interview readiness percentage, and personalized AI recommendations on what to study next.</p>
+      <span class="module-tag">PERSONALIZED · TOPIC-WISE ANALYSIS</span>
+    </div>
+    <div class="module-card" style="background:rgba(26,217,154,0.04);border-left:2px solid rgba(26,217,154,0.3);">
+      <div class="module-icon" style="background:rgba(26,217,154,0.1);border-color:rgba(26,217,154,0.2);">🚀</div>
+      <div class="module-num">COMING SOON</div>
+      <div class="module-title">VOICE INTERVIEW</div>
+      <p class="module-desc">Speak your answers aloud. AI scores your confidence, detects filler words, and coaches your communication skills for in-person rounds.</p>
+      <span class="module-tag" style="background:rgba(245,166,35,0.1);color:var(--amber);border-color:rgba(245,166,35,0.2);">IN DEVELOPMENT</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+  <div class="section-tag">// HOW IT WORKS</div>
+  <h2 class="section-title">FROM ZERO TO<br>INTERVIEW READY</h2>
+  <p class="section-desc">No signup needed. No downloads. Just open and start practicing in under 60 seconds.</p>
+
+  <div class="steps-row">
+    <div class="step-item">
+      <div class="step-circle">01</div>
+      <div class="step-title">Choose your module</div>
+      <p class="step-desc">Pick mock interview, MCQ quiz, HR prep, ATS check, or progress — based on what you need today.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">02</div>
+      <div class="step-title">Select your topic</div>
+      <p class="step-desc">Pick from Thermodynamics, Fluids, Machine Design, CAD/FEA, Manufacturing, Materials, or HR behavioral.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">03</div>
+      <div class="step-title">Practice with AI</div>
+      <p class="step-desc">The AI interviews you, quizzes you, or evaluates your resume — just like a real placement round.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">04</div>
+      <div class="step-title">Get instant feedback</div>
+      <p class="step-desc">Scores, explanations, and improvement tips appear immediately after every answer. No waiting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOPICS -->
+<section class="section" id="topics">
+  <div class="section-tag">// TOPICS COVERED</div>
+  <h2 class="section-title">EVERY ME SUBJECT.<br>FULLY COVERED.</h2>
+  <p class="section-desc">From core engineering fundamentals to specialized placement topics — MechPrep covers the complete mechanical engineering syllabus.</p>
+
+  <div class="topics-wrap">
+    <div class="topic-pill featured">Thermodynamics</div>
+    <div class="topic-pill featured">Fluid Mechanics</div>
+    <div class="topic-pill featured">Machine Design</div>
+    <div class="topic-pill featured">FEA & CAD</div>
+    <div class="topic-pill featured">Strength of Materials</div>
+    <div class="topic-pill featured">Manufacturing Processes</div>
+    <div class="topic-pill">Heat Transfer</div>
+    <div class="topic-pill">Theory of Machines</div>
+    <div class="topic-pill">Engineering Mechanics</div>
+    <div class="topic-pill">Materials Science</div>
+    <div class="topic-pill">IC Engines</div>
+    <div class="topic-pill">Refrigeration & AC</div>
+    <div class="topic-pill">Industrial Engineering</div>
+    <div class="topic-pill">Metrology</div>
+    <div class="topic-pill">Welding & Joining</div>
+    <div class="topic-pill">CNC & Automation</div>
+    <div class="topic-pill">SolidWorks / CATIA</div>
+    <div class="topic-pill">ANSYS Simulation</div>
+    <div class="topic-pill">HR Behavioral</div>
+    <div class="topic-pill">STAR Method</div>
+    <div class="topic-pill">Resume Writing</div>
+    <div class="topic-pill">Group Discussion</div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" id="testimonials" style="background:var(--bg2);border-top:1px solid var(--border);">
+  <div class="section-tag">// STUDENT REVIEWS</div>
+  <h2 class="section-title">WHAT ENGINEERS<br>ARE SAYING</h2>
+  <p class="section-desc">From Anna University students to freshers landing their first jobs — here's what the early users said.</p>
+
+  <div class="testimonials-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The AI interviewer asked follow-up questions I didn't expect — exactly like the real L&T interview. This is the only prep tool built specifically for ME students."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">AK</div>
+        <div>
+          <div class="testi-name">Arun Kumar</div>
+          <div class="testi-role">Final Year · Anna University · Placed at L&T</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"My ATS resume score went from 42 to 81 after following the suggestions. Got 3 interview calls in the same week I updated my resume. Unbelievable."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">PM</div>
+        <div>
+          <div class="testi-name">Priya Muthukumar</div>
+          <div class="testi-role">2024 Passout · PSG Tech · Tiruppur</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Did the Thermodynamics MCQ for 30 minutes every day for a week. Cleared the written test at TVS Motor Company with 86%. The difficulty levels are perfect."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">SK</div>
+        <div>
+          <div class="testi-name">Senthil Kumar</div>
+          <div class="testi-role">BE Mechanical · Coimbatore · Placed at TVS Motors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="try">
+  <div class="section-tag" style="text-align:center;">// START NOW</div>
+  <h2 class="section-title">YOUR PLACEMENT<br>STARTS <span style="color:var(--teal)">TODAY</span></h2>
+  <p class="section-desc">No signup. No credit card. No downloads. Just open MechPrep and start your first mock interview right now — for free.</p>
+  <div class="hero-ctas">
+    <a href="#" class="btn-primary">Launch MechPrep Free →</a>
+    <a href="#modules" class="btn-secondary">Explore features</a>
+  </div>
+  <p class="cta-note">✓ Free forever for students &nbsp;·&nbsp; ✓ No account required &nbsp;·&nbsp; ✓ Works on any device</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">MECHPREP<span> AI</span></div>
+  <div class="footer-note">© 2025 MechPrep · Built for Mechanical Engineers · Made in Tamil Nadu 🇮🇳</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Contact</a>
+    <a href="#">LinkedIn</a>
+  </div>
+</footer>
+
+</body>
+</html>
